@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>🏆 BetCopa 2026</title>
+
+<style>
+
+:root{
+    --bg:#041c32;
+    --bg2:#064663;
+    --gold:#FFD700;
+    --green:#00C853;
+    --red:#ff4d4d;
+    --white:#fff;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI',sans-serif;
+    background:
+    linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.8)),
+    url("img/copa2.jpeg");
+    background-size:cover;
+    background-position:center;
+    color:white;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.game-container{
+    width:100%;
+    max-width:600px;
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(15px);
+    border:2px solid rgba(255,215,0,.3);
+    border-radius:25px;
+    padding:25px;
+    box-shadow:
+    0 0 20px rgba(255,215,0,.3),
+    0 0 50px rgba(0,0,0,.5);
+}
+
+h1{
+    text-align:center;
+    color:var(--gold);
+    font-size:34px;
+    margin-bottom:15px;
+    text-shadow:
+    0 0 10px gold,
+    0 0 20px gold;
+}
+
+.balance{
+    background:linear-gradient(45deg,#0f5132,#198754);
+    padding:18px;
+    border-radius:15px;
+    text-align:center;
+    font-size:26px;
+    font-weight:bold;
+    border:2px solid #00ff95;
+    box-shadow:0 0 15px rgba(0,255,149,.4);
+}
+
+.match-card{
+    margin-top:20px;
+    background:linear-gradient(135deg,#101820,#1f2937);
+    padding:25px;
+    border-radius:20px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.1);
+}
+
+.teams{
+    font-size:28px;
+    font-weight:bold;
+    color:#fff;
+    text-shadow:0 0 10px rgba(255,255,255,.4);
+}
+
+.odds{
+    margin-top:15px;
+    font-size:18px;
+    color:#facc15;
+}
+
+label{
+    margin-bottom:8px;
+    display:block;
+    font-weight:bold;
+}
+
+input,
+select{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#111827;
+    color:white;
+    font-size:16px;
+}
+
+button{
+    width:100%;
+    margin-top:10px;
+    padding:16px;
+    border:none;
+    border-radius:15px;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+    background:linear-gradient(
+        45deg,
+        #009c3b,
+        #ffdf00
+    );
+    color:#000;
+    transition:.3s;
+    box-shadow:0 0 15px rgba(255,223,0,.5);
+}
+
+button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 0 25px rgba(255,223,0,.8);
+}
+
+.result{
+    margin-top:20px;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.win{
+    background:rgba(0,255,100,.15);
+    border:2px solid #00ff73;
+    animation:pulse 1s infinite;
+}
+
+.lose{
+    background:rgba(255,0,0,.15);
+    border:2px solid #ff4d4d;
+}
+
+@keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.02);}
+    100%{transform:scale(1);}
+}
+@keyframes shake{
+    0%{transform:translateX(0);}
+    20%{transform:translateX(-10px);}
+    40%{transform:translateX(10px);}
+    60%{transform:translateX(-10px);}
+    80%{transform:translateX(10px);}
+    100%{transform:translateX(0);}
+}
+
+.shake{
+    animation:shake .6s;
+}
+
+.sad-emoji{
+    position:fixed;
+    top:-50px;
+    font-size:40px;
+    pointer-events:none;
+    z-index:9999;
+    animation:fall linear forwards;
+}
+
+@keyframes fall{
+    from{
+        transform:translateY(-100px) rotate(0deg);
+        opacity:1;
+    }
+    to{
+        transform:translateY(120vh) rotate(360deg);
+        opacity:0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game-container">
+
+<h1>🏆 BETCOPA 2026 ⚽</h1>
+
+<div class="balance">
+Saldo: R$ <span id="balance">1000</span>
+</div>
+
+<div class="match-card">
+
+<div class="teams" id="match-teams">
+Brasil 🇧🇷 vs Alemanha 🇩🇪
+</div>
+
+<div class="odds" id="match-odds">
+Odds
+</div>
+
+</div>
+
+<div class="input-group">
+<label>Seu palpite</label>
+
+<select id="bet-choice">
+<option value="casa">Vitória da Casa</option>
+<option value="empate">Empate</option>
+<option value="fora">Vitória do Visitante</option>
+</select>
+</div>
+
+<div class="input-group">
+<label>Valor da aposta</label>
+
+<input
+id="bet-amount"
+type="number"
+value="100"
+min="1">
+</div>
+
+<button onclick="placeBet()">
+⚽ Confirmar Aposta
+</button>
+
+<div id="result-box" class="result"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<script>
+
+const matches = [
+
+{
+mandante:"Brasil 🇧🇷",
+visitante:"Alemanha 🇩🇪",
+oddCasa:1.65,
+oddEmpate:3.60,
+oddFora:4.50
+},
+
+{
+mandante:"Argentina 🇦🇷",
+visitante:"França 🇫🇷",
+oddCasa:2.30,
+oddEmpate:3.10,
+oddFora:2.80
+},
+
+{
+mandante:"Portugal 🇵🇹",
+visitante:"Uruguai 🇺🇾",
+oddCasa:1.95,
+oddEmpate:3.25,
+oddFora:3.70
+},
+
+{
+mandante:"Espanha 🇪🇸",
+visitante:"Japão 🇯🇵",
+oddCasa:1.40,
+oddEmpate:4.20,
+oddFora:6.00
+}
+
+];
+
+let currentMatchIndex = 0;
+
+let balance =
+parseInt(localStorage.getItem("copa_balance")) || 1000;
+
+const balanceDisplay =
+document.getElementById("balance");
+
+const resultBox =
+document.getElementById("result-box");
+
+function updateBalance(){
+
+balanceDisplay.textContent = balance;
+
+localStorage.setItem(
+"copa_balance",
+balance
+);
+
+}
+
+function loadMatch(){
+
+const m =
+matches[currentMatchIndex];
+
+document.getElementById(
+"match-teams"
+).textContent =
+`${m.mandante} vs ${m.visitante}`;
+
+document.getElementById(
+"match-odds"
+).textContent =
+`Casa ${m.oddCasa} | Empate ${m.oddEmpate} | Fora ${m.oddFora}`;
+
+}
+
+function placeBet(){
+
+const betAmount =
+parseInt(
+document.getElementById(
+"bet-amount"
+).value
+);
+
+const betChoice =
+document.getElementById(
+"bet-choice"
+).value;
+
+const currentMatch =
+matches[currentMatchIndex];
+
+if(isNaN(betAmount) || betAmount <= 0){
+
+alert("Digite um valor válido.");
+return;
+
+}
+
+if(betAmount > balance){
+
+alert("Saldo insuficiente.");
+return;
+
+}
+
+balance -= betAmount;
+
+const golsCasa =
+Math.floor(Math.random()*5);
+
+const golsFora =
+Math.floor(Math.random()*5);
+
+let resultadoReal;
+
+if(golsCasa > golsFora)
+resultadoReal="casa";
+else if(golsFora > golsCasa)
+resultadoReal="fora";
+else
+resultadoReal="empate";
+
+resultBox.style.display="block";
+
+if(betChoice === resultadoReal){
+
+let odd = currentMatch.oddCasa;
+
+if(resultadoReal==="empate")
+odd=currentMatch.oddEmpate;
+
+if(resultadoReal==="fora")
+odd=currentMatch.oddFora;
+
+const premio =
+Math.floor(
+betAmount * odd
+);
+
+balance += premio;
+
+balance += 500;
+
+updateBalance();
+
+resultBox.className =
+"result win";
+
+resultBox.innerHTML=
+`
+🏆 PARABÉNS! 🏆
+<br><br>
+⚽ Placar:
+${golsCasa} x ${golsFora}
+<br><br>
+💰 Você ganhou
+R$${premio}
+<br>
+🎁 Bônus:
+R$500
+`;
+
+confetti({
+particleCount:300,
+spread:180,
+origin:{y:.6}
+});
+
+}
+else{
+
+updateBalance();
+
+sadEffect();
+
+resultBox.className =
+"result lose";
+
+resultBox.innerHTML=
+`
+❌ Você perdeu!
+<br><br>
+⚽ Placar:
+${golsCasa} x ${golsFora}
+<br><br>
+Perdeu
+R$${betAmount}
+`;
+
+}
+
+currentMatchIndex =
+(currentMatchIndex + 1)
+% matches.length;
+
+setTimeout(loadMatch,2000);
+
+}
+function sadEffect(){
+
+    document.body.classList.add("shake");
+
+    setTimeout(()=>{
+        document.body.classList.remove("shake");
+    },600);
+
+    for(let i=0;i<30;i++){
+
+        const emoji =
+        document.createElement("div");
+
+        emoji.className = "sad-emoji";
+
+        emoji.innerHTML = "😢";
+
+        emoji.style.left =
+        Math.random()*100 + "vw";
+
+        emoji.style.animationDuration =
+        (2 + Math.random()*3) + "s";
+
+        document.body.appendChild(emoji);
+
+        setTimeout(()=>{
+            emoji.remove();
+        },5000);
+    }
+
+}
+updateBalance();
+loadMatch();
+
+</script>
+
+</body>
+</html>
